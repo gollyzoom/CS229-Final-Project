@@ -50,9 +50,9 @@ hdf5_store.close()
 #print(x_data.shape)
 
 X_train, X_test, y_train, y_test = train_test_split(input_data, output_data, test_size=0.02, random_state=42)
-X_train, X_test, y_train, y_test = train_test_split(input_data, watermarked, test_size=0.02, random_state=42)
+#X_train, X_test, y_train, y_test = train_test_split(input_data, watermarked, test_size=0.02, random_state=42)
 
-
+#### DISPLAY THE GAN OUTPUT AND THE TRUE IMAGE ####
 n = 10
 plt.figure(figsize=(20, 4))
 for i in range(n):
@@ -60,14 +60,14 @@ for i in range(n):
     # display original + noise
     ax = plt.subplot(2, n, i + 1)
     plt.title("original + noise")
-    plt.imshow(tf.squeeze(y_test[i]))
+    plt.imshow(tf.squeeze(X_test[i]))
     plt.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
     bx = plt.subplot(2, n, i + n + 1)
     plt.title("reconstructed")
-    plt.imshow(tf.squeeze(X_test[i]))
+    plt.imshow(tf.squeeze(Y_test[i]))
     plt.gray()
     bx.get_xaxis().set_visible(False)
     bx.get_yaxis().set_visible(False)
@@ -76,6 +76,9 @@ plt.show()
 
 #opt = tf.keras.optimizers.Adam(learning_rate=0.005, beta_1=0.5)
 #autoencoder.compile(optimizer=opt)
+
+#### Train an autoencoder to remove the noise from the GAN outputs ####
+
 autoencoder.fit(X_train, y_train,
                 batch_size=8,
                 epochs=50,
@@ -83,6 +86,8 @@ autoencoder.fit(X_train, y_train,
                 validation_data=(X_test, y_test))
 encoded_imgs = autoencoder.encoder(X_test).numpy()
 decoded_imgs = autoencoder.decoder(encoded_imgs).numpy()
+
+#### DISPLAY GAN OUTPUT IMAGES VS CLEANED IMAGES ####
 
 n = 10
 plt.figure(figsize=(20, 4))
